@@ -31,16 +31,16 @@ const AdminCard: React.FC<StatCardProps> = ({
   isActionRequired,
   icon,
 }) => (
-  <div className="bg-white p-6 rounded-2xl border-t-4 border-[#d0a539]/20 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
+  <div className="bg-white p-5 sm:p-6 rounded-2xl border-t-4 border-[#d0a539]/20 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
     <div className="flex justify-between items-start mb-4">
       {icon}
       {isActionRequired ? (
-        <span className="bg-[#d0a539]/20 text-[#d0a539] px-2 py-0.5 rounded text-[10px] font-black">
+        <span className="bg-[#d0a539]/20 text-[#d0a539] px-2 py-0.5 rounded text-[10px] font-black whitespace-nowrap">
           ACTION REQ.
         </span>
       ) : (
         <span
-          className={`text-xs font-bold ${isPositive ? "text-emerald-500" : "text-red-500"}`}
+          className={`text-xs font-bold ${isPositive ? "text-emerald-500" : "text-red-500"} whitespace-nowrap`}
         >
           {change}
         </span>
@@ -49,13 +49,12 @@ const AdminCard: React.FC<StatCardProps> = ({
     <p className="text-xs font-bold uppercase tracking-widest text-[#171512]/40 mb-1">
       {title}
     </p>
-    <p className="text-3xl font-black text-[#171512]">{value}</p>
+    <p className="text-2xl sm:text-3xl font-black text-[#171512]">{value}</p>
   </div>
 );
 
-// This is your Main component, turned into an async Server Component
+// Main async Server Component
 export default async function Main() {
-  // Fetch dynamic data right here on the server
   const data = await getDashboardData();
 
   const statsData: StatCardProps[] = [
@@ -64,92 +63,90 @@ export default async function Main() {
       value: data.stats.totalUsers,
       change: "Live",
       isPositive: true,
-      icon: <Users className="text-[#d0a539]" />,
+      icon: <Users className="text-[#d0a539] w-8 h-8 sm:w-10 sm:h-10" />,
     },
     {
       title: "Active Investments",
       value: data.stats.activeInvestments,
       change: "Live",
       isPositive: true,
-      icon: <Landmark className="text-[#d0a539]" />,
+      icon: <Landmark className="text-[#d0a539] w-8 h-8 sm:w-10 sm:h-10" />,
     },
-    // --- UPDATED STAT CARD ---
     {
       title: "Initiated Investments",
       value: data.stats.initiatedInvestments,
       change: "Live",
       isPositive: true,
-      icon: <TrendingUp className="text-[#d0a539]" />,
+      icon: <TrendingUp className="text-[#d0a539] w-8 h-8 sm:w-10 sm:h-10" />,
     },
-    // -------------------------
     {
       title: "Pending Approvals",
       value: data.stats.pendingApprovals,
       change: "ACTION REQ.",
       isActionRequired: Number(data.stats.pendingApprovals) > 0,
-      icon: <Clock className="text-[#d0a539]" />,
+      icon: <Clock className="text-[#d0a539] w-8 h-8 sm:w-10 sm:h-10" />,
     },
   ];
 
   return (
-    <main className="flex-1 p-6 lg:p-10 bg-[#f8f7f6] min-h-screen font-sans text-[#171512]">
+    <main className="flex-1  p-4 md:p-6 lg:p-10 pt-20 md:pt-[5rem] lg:pt-5 bg-[#f8f7f6] min-h-screen font-sans text-[#171512]">
       {/* Header Section */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-6 mb-8 sm:mb-10">
         <div>
-          <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#171512]/40 mb-2">
+          <nav className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#171512]/40 mb-1 sm:mb-2">
             <span>Management</span>
             <ChevronRight className="w-3 h-3" />
             <span className="text-[#d0a539]">Command Center</span>
           </nav>
-          <h1 className="text-4xl lg:text-5xl font-black text-[#171512] leading-none italic font-serif">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#171512] leading-tight italic font-serif">
             Admin Dashboard
           </h1>
         </div>
       </header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 mb-8 sm:mb-10">
         {statsData.map((stat, index) => (
           <AdminCard key={index} {...stat} />
         ))}
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8 lg:gap-10">
         {/* Left Column: Recent Investments Table */}
         <div className="xl:col-span-8">
           <div className="bg-white rounded-2xl border border-[#171512]/5 overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
-            <div className="p-6 border-b border-[#171512]/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <h2 className="text-2xl font-black italic font-serif">
+            <div className="p-5 sm:p-6 border-b border-[#171512]/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <h2 className="text-xl sm:text-2xl font-black italic font-serif">
                 Recent Investments
               </h2>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-2 px-3 py-1.5 border border-[#171512]/10 rounded-lg text-xs font-bold text-[#171512]/60 hover:bg-gray-50">
+                <button className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 border border-[#171512]/10 rounded-lg text-xs font-bold text-[#171512]/60 hover:bg-gray-50">
                   <Filter className="w-4 h-4" /> Filter
                 </button>
-                <button className="flex items-center gap-2 px-3 py-1.5 border border-[#171512]/10 rounded-lg text-xs font-bold text-[#171512]/60 hover:bg-gray-50">
+                <button className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 border border-[#171512]/10 rounded-lg text-xs font-bold text-[#171512]/60 hover:bg-gray-50">
                   <ArrowUpDown className="w-4 h-4" /> Sort
                 </button>
               </div>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-left min-w-[640px]">
                 <thead className="bg-[#f8f7f6] border-b border-[#171512]/5">
                   <tr>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
+                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
                       User
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
+                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
                       Project
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
+                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
                       Date
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
+                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40">
                       Amount
                     </th>
-                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40 text-right">
+                    <th className="px-4 sm:px-6 py-3 sm:py-4 text-[10px] font-black uppercase tracking-widest text-[#171512]/40 text-right">
                       Actions
                     </th>
                   </tr>
@@ -161,13 +158,13 @@ export default async function Main() {
                         key={item.id}
                         className="hover:bg-[#f8f7f6]/50 transition-colors"
                       >
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[#171512]/5 flex items-center justify-center font-bold text-xs">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-8 h-8 rounded-full bg-[#171512]/5 flex items-center justify-center font-bold text-xs shrink-0">
                               {item.user.initials}
                             </div>
-                            <div>
-                              <p className="text-sm font-bold">
+                            <div className="min-w-0">
+                              <p className="text-sm font-bold truncate">
                                 {item.user.name}
                               </p>
                               <p className="text-[10px] text-[#171512]/40 uppercase font-bold">
@@ -176,22 +173,24 @@ export default async function Main() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-medium">{item.project}</p>
+                        <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <p className="text-sm font-medium truncate max-w-[140px] sm:max-w-none">
+                            {item.project}
+                          </p>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm text-[#171512]/60">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <p className="text-sm text-[#171512]/60 whitespace-nowrap">
                             {item.date}
                           </p>
                         </td>
-                        <td className="px-6 py-4">
-                          <p className="text-sm font-bold text-[#d0a539]">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4">
+                          <p className="text-sm font-bold text-[#d0a539] whitespace-nowrap">
                             {item.amount}
                           </p>
                         </td>
-                        <td className="px-6 py-4 text-right">
+                        <td className="px-4 sm:px-6 py-3 sm:py-4 text-right">
                           <button className="text-[#171512]/30 hover:text-[#d0a539] transition-colors">
-                            <MoreHorizontal className="w-5 h-5 ml-auto" />
+                            <MoreHorizontal className="w-5 h-5 inline" />
                           </button>
                         </td>
                       </tr>
@@ -219,29 +218,29 @@ export default async function Main() {
         </div>
 
         {/* Right Column: Payments & Portfolio */}
-        <div className="xl:col-span-4 space-y-8">
+        <div className="xl:col-span-4 space-y-6 sm:space-y-8">
           {/* Payments Pipeline */}
           <div className="bg-white rounded-2xl border border-[#171512]/5 overflow-hidden shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)]">
-            <div className="p-6 border-b border-[#171512]/5">
-              <h3 className="text-2xl font-black italic font-serif">
+            <div className="p-5 sm:p-6 border-b border-[#171512]/5">
+              <h3 className="text-xl sm:text-2xl font-black italic font-serif">
                 Payments Pipeline
               </h3>
             </div>
-            <div className="p-6 space-y-6">
+            <div className="p-5 sm:p-6 space-y-4 sm:space-y-6">
               {data.paymentsData.length > 0 ? (
                 data.paymentsData.map((payment) => (
                   <div
                     key={payment.id}
-                    className={`flex items-start justify-between gap-4 p-4 rounded-xl border transition-all ${
+                    className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-4 rounded-xl border transition-all ${
                       payment.status === "Overdue"
                         ? "border-red-500/10 bg-red-500/[0.02] hover:border-red-500/30"
                         : "border-[#171512]/5 hover:border-[#d0a539]/20"
                     }`}
                   >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
                             payment.status === "Overdue"
                               ? "bg-red-500/10 text-red-500"
                               : "bg-[#d0a539]/10 text-[#d0a539]"
@@ -249,16 +248,18 @@ export default async function Main() {
                         >
                           {payment.status}
                         </span>
-                        <span className="text-[10px] font-bold text-[#171512]/40">
+                        <span className="text-[10px] font-bold text-[#171512]/40 shrink-0">
                           #{payment.id}
                         </span>
                       </div>
-                      <p className="text-sm font-bold">{payment.user}</p>
+                      <p className="text-sm font-bold truncate">
+                        {payment.user}
+                      </p>
                       <p className="text-xs text-[#171512]/60">
                         {payment.type}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <p className="text-sm font-black">{payment.amount}</p>
                       <p
                         className={`text-[10px] font-bold uppercase ${
@@ -285,7 +286,7 @@ export default async function Main() {
           </div>
 
           {/* Portfolio Diversity */}
-          <div className="bg-[#171512] p-8 rounded-2xl text-white relative overflow-hidden">
+          <div className="bg-[#171512] p-6 sm:p-8 rounded-2xl text-white relative overflow-hidden">
             <div className="relative z-10">
               <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#d0a539] mb-4">
                 Portfolio Diversity
@@ -307,14 +308,13 @@ export default async function Main() {
                       <div
                         className={`h-full ${idx === 0 ? "bg-[#d0a539]" : "bg-[#d0a539]/60"}`}
                         style={{ width: `${item.percentage}%` }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            {/* Background Decoration */}
-            <PieChart className="absolute -bottom-8 -right-8 w-[180px] h-[180px] text-white/5 pointer-events-none" />
+            <PieChart className="absolute -bottom-8 -right-8 w-[140px] h-[140px] sm:w-[180px] sm:h-[180px] text-white/5 pointer-events-none" />
           </div>
         </div>
       </div>

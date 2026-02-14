@@ -14,7 +14,7 @@ const SignUpHero = memo(() => {
   return (
     <div className="hidden lg:flex lg:w-1/2 relative h-full overflow-hidden">
       <div className="absolute inset-0 z-10 bg-black/40"></div>
-      
+
       <div className="absolute inset-0 z-0">
         <Image
           src="/signup_img.jpg"
@@ -51,7 +51,7 @@ SignUpHero.displayName = "SignUpHero";
 // ==========================================
 const SignUpForm = () => {
   const router = useRouter();
-  
+
   // Local UI States
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +63,7 @@ const SignUpForm = () => {
     setError(null);
 
     const formData = new FormData(e.currentTarget);
-    
+
     // Client-side Validation
     if (formData.get("password") !== formData.get("password_confirm")) {
       setError("Passwords do not match!");
@@ -180,7 +180,9 @@ const SignUpForm = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#171512]/40 hover:text-[#d0a539] transition-colors"
                 >
-                  <span className="text-xs font-bold">{showPassword ? "HIDE" : "SHOW"}</span>
+                  <span className="text-xs font-bold">
+                    {showPassword ? "HIDE" : "SHOW"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -201,15 +203,9 @@ const SignUpForm = () => {
 
             <button
               disabled={loading}
-              className="w-full bg-[#d0a539] text-[#171512] font-black uppercase tracking-[0.2em] py-4 rounded-lg hover:bg-opacity-90 transition-all shadow-lg shadow-[#d0a539]/20 disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-[#d0a539] text-[#171512] font-black uppercase tracking-[0.2em] py-4 rounded-lg hover:bg-opacity-90 transition-all shadow-lg shadow-[#d0a539]/20 disabled:opacity-50"
             >
-              {loading ? (
-                <>
-                  Processing...
-                </>
-              ) : (
-                "Create Account"
-              )}
+              {loading ? <>Processing...</> : "Create Account"}
             </button>
           </form>
 

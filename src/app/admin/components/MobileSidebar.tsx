@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react"; // 1. Import signOut
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Building2,
@@ -13,7 +13,9 @@ import {
   Tag,
   X,
   LogOut,
-  Menu, // Imported Menu icon for cleaner hamburger
+  Menu,
+  Users, // Added
+  Briefcase, // Added
 } from "lucide-react";
 
 const MobileSidebar = () => {
@@ -34,25 +36,27 @@ const MobileSidebar = () => {
     }
     return () => {
       document.body.style.overflow = "unset";
-    }; // Cleanup
+    };
   }, [isOpen]);
 
-  // Helper Logic for Active Links
+  // Helper Logic for Active Links (Ported from Desktop)
   const isActive = (path: string) => {
-    if (path === "/dashboard") {
+    // Exact match for the root dashboard to avoid it staying active on subpages like /admin/payments
+    if (path === "/admin") {
       return pathname === path;
     }
+    // For other routes, allow sub-path matching (e.g. /admin/users/123 keeps /admin/users active)
     return pathname?.startsWith(path);
   };
 
   const getLinkClasses = (path: string) => {
     const active = isActive(path);
     return active
-      ? "flex items-center gap-4 px-4 py-3 rounded-lg bg-[#d0a539]/10 border-r-4 border-[#d0a539] text-[#d0a539] transition-all"
-      : "flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-white/5 text-gray-400 hover:text-[#d0a539] transition-all group";
+      ? "flex items-center gap-4 px-4 py-3 rounded-lg bg-[#d0a539]/10 border-r-4 border-[#d0a539] text-[#d0a539] transition-all font-bold"
+      : "flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-white/5 text-gray-400 hover:text-[#d0a539] transition-all group font-medium";
   };
 
-  // 2. Handle Logout
+  // Handle Logout
   const handleLogout = async () => {
     await signOut({ callbackUrl: "/authentication/signin" });
   };
@@ -61,7 +65,7 @@ const MobileSidebar = () => {
     <>
       {/* Mobile Top Bar */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#171512] z-40 flex items-center justify-between px-6 border-b border-[#d0a539]/10 shadow-md">
-        <Link href="/dashboard" className="flex items-center gap-2">
+        <Link href="/admin" className="flex items-center gap-2">
           <div className="relative w-8 h-8">
             <Image
               src="/bugakingLogo.png"
@@ -120,50 +124,58 @@ const MobileSidebar = () => {
           </button>
         </div>
 
+        {/* Navigation Links (Mirrored from Desktop Admin Sidebar) */}
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-          <Link href="/dashboard" className={getLinkClasses("/dashboard")}>
-            <LayoutDashboard size={20} strokeWidth={2} />
-            <span className="text-sm font-bold uppercase tracking-widest">
+          
+          <Link href="/admin" className={getLinkClasses("/admin")}>
+            <LayoutDashboard size={22} strokeWidth={isActive("/admin") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
               Dashboard
             </span>
           </Link>
 
-          <Link
-            href="/dashboard/portfolio"
-            className={getLinkClasses("/dashboard/portfolio")}
-          >
-            <Building2 size={20} strokeWidth={2} />
-            <span className="text-sm font-bold uppercase tracking-widest">
-              Portfolio
+          <Link href="/admin/users" className={getLinkClasses("/admin/users")}>
+            <Users size={22} strokeWidth={isActive("/admin/users") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
+              Users
             </span>
           </Link>
 
-          <Link
-            href="/dashboard/payments"
-            className={getLinkClasses("/dashboard/payments")}
-          >
-            <CreditCard size={20} strokeWidth={2} />
-            <span className="text-sm font-bold uppercase tracking-widest">
-              Payments
+          <Link href="/admin/client-investments" className={getLinkClasses("/admin/client-investments")}>
+            <Briefcase size={22} strokeWidth={isActive("/admin/client-investments") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
+              CL Investments
             </span>
           </Link>
 
-          <Link
-            href="/dashboard/documents"
-            className={getLinkClasses("/dashboard/documents")}
-          >
-            <FileText size={20} strokeWidth={2} />
-            <span className="text-sm font-bold uppercase tracking-widest">
+          <Link href="/admin/projects" className={getLinkClasses("/admin/projects")}>
+            <Building2 size={22} strokeWidth={isActive("/admin/projects") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
+              Projects
+            </span>
+          </Link>
+
+          <Link href="/admin/payments" className={getLinkClasses("/admin/payments")}>
+            <CreditCard size={22} strokeWidth={isActive("/admin/payments") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
+              Transactions
+            </span>
+          </Link>
+
+          <Link href="/admin/documents" className={getLinkClasses("/admin/documents")}>
+            <FileText size={22} strokeWidth={isActive("/admin/documents") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
               Documents
             </span>
           </Link>
 
           <Link href="/offers" className={getLinkClasses("/offers")}>
-            <Tag size={20} strokeWidth={2} />
-            <span className="text-sm font-bold uppercase tracking-widest">
+            <Tag size={22} strokeWidth={isActive("/offers") ? 2.5 : 2} />
+            <span className="text-sm uppercase tracking-widest">
               Offers
             </span>
           </Link>
+
         </nav>
 
         {/* Logout Section */}

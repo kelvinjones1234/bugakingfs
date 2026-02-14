@@ -192,7 +192,7 @@ const SignInForm = () => {
 
             <button
               disabled={loading}
-              className="w-full bg-[#171512] text-white font-black uppercase tracking-[0.2em] py-4 rounded-lg hover:bg-[#d0a539] hover:text-[#171512] transition-all shadow-xl disabled:opacity-50 flex items-center justify-center gap-3"
+              className="w-full bg-[#d0a539] text-[#171512] font-black uppercase tracking-[0.2em] py-4 rounded-lg hover:bg-opacity-90 transition-all shadow-lg shadow-[#d0a539]/20 disabled:opacity-50"
             >
               {loading ? (
                 <>
