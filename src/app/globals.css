@@ -1,8 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;700;900&display=swap');
+/* --- Added Manrope, Playfair Display, and Material Icons to your imports --- */
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;700;900&family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 @layer base {
   :root {
@@ -15,11 +17,9 @@
     --border: rgba(23, 21, 18, 0.1);
 
     /* --- SPACING VARIABLES --- */
-    /* Use these for consistent layout padding */
     --padding-container-mobile: 1.5rem;  /* 24px (px-6) */
     --padding-container-desktop: 2.5rem; /* 40px (px-10) */
     
-    /* Use these for vertical gaps between sections */
     --spacing-section: 5rem;     /* 80px (my-20) */
     --spacing-element: 1.5rem;   /* 24px (gap-6) */
 
@@ -32,13 +32,54 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    /* Note: If you want to use Epilogue globally, keep this. 
+       If you want the landing page to use Manrope/Playfair, you will use 
+       font-sans/font-serif classes in your components. */
     font-family: 'Epilogue', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 }
 
+@layer components {
+  /* --- CUSTOM SLIDER STYLES --- */
+  input[type=range].bugaking-slider {
+    -webkit-appearance: none; 
+    width: 100%; 
+    background: transparent; 
+  }
+  input[type=range].bugaking-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: #d4af37;
+    border: 3px solid #fff;
+    cursor: pointer;
+    margin-top: -10px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  input[type=range].bugaking-slider::-moz-range-thumb {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: #d4af37;
+    border: 3px solid #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+  input[type=range].bugaking-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #e2e8f0;
+    border-radius: 2px;
+  }
+  input[type=range].bugaking-slider:focus::-webkit-slider-runnable-track {
+    background: #cbd5e1;
+  }
+}
+
 @layer utilities {
-  /* A utility class for that specific layout width you used */
   .container-width {
     max-width: 1280px;
     margin-left: auto;
@@ -47,7 +88,6 @@
     padding-right: var(--padding-container-mobile);
   }
 
-  /* Responsive adjustment using Tailwind's screen handling */
   @media (min-width: 1024px) {
     .container-width {
       padding-left: var(--padding-container-desktop);
@@ -57,5 +97,12 @@
 
   .luxury-gradient {
     background: linear-gradient(135deg, rgba(208, 165, 57, 0.1) 0%, rgba(26, 26, 26, 0) 100%);
+  }
+
+  /* --- ADDED TEXT GRADIENT --- */
+  .gold-text-gradient {
+    background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #b4942b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 }

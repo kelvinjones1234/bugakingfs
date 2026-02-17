@@ -70,6 +70,7 @@ model User {
   // Application Relation
   profile           Profile?
   clientInvestments ClientInvestment[]
+  documents       Document[]
   transactions      Transaction[]      // 1. Relation to Transaction
 
   @@map("users")
@@ -254,4 +255,19 @@ model PasswordResetToken {
 
   @@unique([email, token])
   @@map("password_reset_tokens")
+}
+
+
+
+// --- DOCUMENT MODULE (New Model) ---
+model Document {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  fileUrl   String   // The URL from Cloudinary or your storage provider
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("documents")
 }
