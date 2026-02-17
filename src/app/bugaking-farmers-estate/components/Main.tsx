@@ -108,7 +108,7 @@ export default function Main() {
 
       <main className="w-full mx-auto flex flex-col items-center gap-20 bg-[#fcfdfc]">
         {/* --- FEATURES STRIP --- */}
-        <section className="w-full bg-[#0a2f1c] text-white py-12 px-4 relative overflow-hidden">
+        <section className="w-full bg-[#0a2f1c] text-white px-4 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10"
             style={{
@@ -346,7 +346,7 @@ export default function Main() {
         </section>
 
         {/* --- GALLERY CAROUSEL --- */}
-        <section className="w-full py-12 sm:py-16 bg-slate-50 overflow-hidden">
+        <section className="w-full sm:py-16 bg-slate-50 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 sm:mb-8 flex flex-row items-end sm:items-center justify-between gap-4">
             <div className="flex-1">
               <h2 className="font-['Playfair_Display',_serif] font-bold text-2xl md:text-3xl text-[#0a2f1c] leading-tight">
