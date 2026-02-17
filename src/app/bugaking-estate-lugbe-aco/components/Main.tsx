@@ -2,47 +2,70 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Shield, ShieldCheck, Sprout, Tractor } from "lucide-react";
+import { ShieldCheck, MapPin, Key, TreeDeciduous, Plane } from "lucide-react";
 
 export default function Main() {
-  // --- CALCULATOR STATE & LOGIC ---
-  const [plots, setPlots] = useState<number>(1);
-  const [plan, setPlan] = useState<"outright" | "monthly" | "weekly">("outright");
+  // --- STATE ---
+  const [plotSize, setPlotSize] = useState<"150sqm" | "180sqm" | "200sqm">(
+    "150sqm",
+  );
+  const [plan, setPlan] = useState<"outright" | "6_months" | "weekly">(
+    "outright",
+  );
+  const [units, setUnits] = useState<number>(1);
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
 
-  // Constants based on the BugaKing Farmers Estate Offer
-  const PLOT_SIZE_SQM = 500;
-  const OUTRIGHT_PRICE = 1800000;
-  const MONTHLY_PRICE = 384000; 
-  const WEEKLY_PRICE = 96000; 
+  // --- PRICING LOGIC ---
+  const PRICING = {
+    "150sqm": {
+      outright: 3300000,
+      monthly: 633000,
+      weekly: 158250,
+      installmentTotal: 3798000,
+    },
+    "180sqm": {
+      outright: 4300000,
+      monthly: 800000,
+      weekly: 200000,
+      installmentTotal: 4800000,
+    },
+    "200sqm": {
+      outright: 5300000,
+      monthly: 966700,
+      weekly: 241645,
+      installmentTotal: 5800200,
+    },
+  };
 
-  // Derived calculations
-  const totalSqm = plots * PLOT_SIZE_SQM;
+  const currentPrice = PRICING[plotSize];
   let totalCost = 0;
   let installmentAmount = 0;
 
   if (plan === "outright") {
-    totalCost = plots * OUTRIGHT_PRICE;
-  } else if (plan === "monthly") {
-    installmentAmount = plots * MONTHLY_PRICE;
-    totalCost = installmentAmount * 6; // 6 months total
-  } else if (plan === "weekly") {
-    installmentAmount = plots * WEEKLY_PRICE;
-    totalCost = installmentAmount * 24; // Approx 24 weeks in 6 months
+    totalCost = units * currentPrice.outright;
+  } else {
+    totalCost = units * currentPrice.installmentTotal;
+    if (plan === "6_months") {
+      installmentAmount = units * currentPrice.monthly;
+    } else if (plan === "weekly") {
+      installmentAmount = units * currentPrice.weekly;
+    }
   }
 
-  // Formatting helpers
+  // --- HELPERS & HANDLERS ---
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-NG").format(value);
   };
 
-  const minPlots = 1;
-  const maxPlots = 10;
-  const sliderPercentage = ((plots - minPlots) / (maxPlots - minPlots)) * 100;
-
-  // --- EVENT HANDLERS ---
   const handleWhatsApp = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    window.open("https://wa.me/2348027788128", "_blank"); 
+
+    // Create a dynamic, pre-filled message based on the user's selection
+    const message = `Hello BugaKing Group. My name is ${fullName || "a prospective buyer"}. I am interested in securing ${units} plot(s) of ${plotSize} at BugaKing Estate, Lugbe Aco. I would like to proceed with the ${plan.replace("_", " ")} payment plan. Please share the official brochure and next steps.`;
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/2348027788128?text=${encodedMessage}`, "_blank");
   };
 
   const scrollGallery = (direction: "left" | "right") => {
@@ -55,8 +78,10 @@ export default function Main() {
     }
   };
 
+  const sliderPercentage = ((units - 1) / 4) * 100;
+
   return (
-    <div className="font-['Manrope',_sans-serif] bg-[#fcfdfc] text-slate-800 min-h-screen flex flex-col selection:bg-[#0ff035] selection:text-[#0a2f1c]">
+    <div className="font-['Manrope',_sans-serif] bg-[#fcfdfc] text-slate-800 min-h-screen flex flex-col selection:bg-[#d4af37] selection:text-[#0a2f1c]">
       {/* --- NAVIGATION --- */}
       <nav className="absolute top-0 w-full flex justify-center py-6 z-20 px-4">
         <div className="flex flex-col items-center">
@@ -64,7 +89,7 @@ export default function Main() {
             <div>
               <Image
                 src="/bugakingLogo.png"
-                alt="Logo"
+                alt="BugaKing Group Logo"
                 width={80}
                 height={50}
                 className="object-contain"
@@ -78,36 +103,62 @@ export default function Main() {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <header className="text-center max-w-4xl mx-auto space-y-6 mb-[5rem] mt-[10rem] px-4">
-        <div className="inline-block bg-[#0a2f1c]/10 text-[#0a2f1c] font-bold px-4 py-1 rounded-full text-xs border border-[#0a2f1c]/20">
-          📍 Kuje - Abuja
+      <header className="text-center max-w-4xl mx-auto space-y-6 mb-[4rem] mt-[10rem] px-4">
+        <div className="flex flex-wrap justify-center gap-3">
+          {/* <div className="inline-block bg-[#0a2f1c]/10 text-[#0a2f1c] font-bold px-4 py-1.5 rounded-full text-xs border border-[#0a2f1c]/20">
+            📍 BugaKing Estate, Lugbe Aco
+          </div> */}
+          <div className="inline-block bg-[#d4af37]/20 text-[#0a2f1c] font-bold px-4 py-1.5 rounded-full text-xs border border-[#d4af37]/50">
+            📜 Title: Right of Occupancy (R of O)
+          </div>
         </div>
+
         <h1 className="font-['Playfair_Display',_serif] font-bold text-4xl md:text-6xl lg:text-7xl text-[#0a2f1c] leading-[1.1]">
-          Don’t Just Own Land.
-          <br />
+          Own{" "}
           <span className="relative inline-block">
-            Own a Harvest.
+            Verified
             <svg
-              className="absolute w-full h-3 -bottom-1 left-0 text-[#0ff035] opacity-60"
+              className="absolute w-full h-3 -bottom-1 left-0 text-[#d4af37] opacity-80"
               fill="none"
               viewBox="0 0 200 9"
+              preserveAspectRatio="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M2.00025 6.99997C25.7501 3.99991 132.5 -8.19967 198 6.99997"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+              ></path>
+            </svg>
+          </span>
+          <br />
+          <span className="relative inline-block mt-2">
+            Abuja Real Estate.
+            <svg
+              className="absolute w-full h-3 -bottom-1 left-0 text-[#d4af37] opacity-60"
+              fill="none"
+              viewBox="0 0 200 9"
+              preserveAspectRatio="none"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 d="M2.00025 6.99997C25.7501 3.99991 132.5 -8.19967 198 6.99997"
                 stroke="currentColor"
                 strokeWidth="3"
+                strokeLinecap="round"
               ></path>
             </svg>
           </span>
         </h1>
         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-light">
-          Secure strategically located farmland at BugaKing Farmers Estate. Tailored payment plans designed for your agricultural goals.
+          Secure a verified plot at BugaKing Estate with flexible, stress-free
+          payment plans, starting from ₦158,250 weekly.
         </p>
       </header>
 
-      <main className="w-full mx-auto flex flex-col items-center gap-20 bg-[#fcfdfc]">
-        {/* --- FEATURES STRIP --- */}
+      <main className="w-full mx-auto flex flex-col items-center gap-16 bg-[#fcfdfc]">
+        {/* --- TRUST & LOCATION STRIP --- */}
         <section className="w-full bg-[#0a2f1c] text-white py-12 px-4 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10"
@@ -118,37 +169,32 @@ export default function Main() {
           ></div>
 
           <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
-            {/* Title */}
             <div className="text-center space-y-2">
               <ShieldCheck className="w-10 h-10 mx-auto text-[#d4af37]" />
-              <h3 className="font-bold text-lg">AGIS & R of O</h3>
+              <h3 className="font-bold text-lg">100% Secure</h3>
               <p className="text-xs text-white/60">
-                Verified documentation
+                Free from government acquisition
               </p>
             </div>
-
-            {/* Purpose */}
             <div className="text-center space-y-2">
-              <Tractor className="w-10 h-10 mx-auto text-[#d4af37]" />
-              <h3 className="font-bold text-lg">Strictly Farming</h3>
+              <Plane className="w-10 h-10 mx-auto text-[#d4af37]" />
+              <h3 className="font-bold text-lg">Proximity</h3>
               <p className="text-xs text-white/60">
-                Dedicated agricultural zone
+                Minutes to Nnamdi Azikiwe Airport
               </p>
             </div>
-
-            {/* Management */}
             <div className="text-center space-y-2">
-              <Sprout className="w-10 h-10 mx-auto text-[#d4af37]" />
-              <h3 className="font-bold text-lg">500sqm Plots</h3>
-              <p className="text-xs text-white/60">Optimized for yield</p>
-            </div>
-
-            {/* Security */}
-            <div className="text-center space-y-2">
-              <Shield className="w-10 h-10 mx-auto text-[#d4af37]" />
-              <h3 className="font-bold text-lg">Secure Investment</h3>
+              <MapPin className="w-10 h-10 mx-auto text-[#d4af37]" />
+              <h3 className="font-bold text-lg">Prime Lugbe</h3>
               <p className="text-xs text-white/60">
-                Flexible payment structures
+                Highly sought-after rapid development hub
+              </p>
+            </div>
+            <div className="text-center space-y-2">
+              <Key className="w-10 h-10 mx-auto text-[#d4af37]" />
+              <h3 className="font-bold text-lg">Instant Allocation</h3>
+              <p className="text-xs text-white/60">
+                Upon completion of full payment
               </p>
             </div>
           </div>
@@ -157,79 +203,86 @@ export default function Main() {
         {/* --- CALCULATOR SECTION --- */}
         <section
           id="calculator-section"
-          className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 "
+          className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 pt-4"
         >
           <div className="text-center mb-12">
             <span className="text-[#d4af37] font-bold uppercase tracking-widest text-xs mb-2 block">
-              Payment Plan Calculator
+              Transparent Pricing
             </span>
             <h2 className="font-['Playfair_Display',_serif] font-bold text-3xl md:text-4xl text-[#0a2f1c] mb-4">
-              Structure Your Investment
+              Structure Your Payment
             </h2>
             <p className="text-slate-500 max-w-2xl mx-auto">
-              Select your desired number of plots and explore our flexible outright, monthly, or weekly payment options.
+              Select your preferred plot size and explore our convenient
+              outright, monthly, or weekly payment options over 6 months.
             </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-[0_20px_40px_-15px_rgba(10,47,28,0.1)] border border-slate-100 p-6 md:p-12 relative z-10 overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0a2f1c] via-[#0ff035] to-[#d4af37]"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#0a2f1c] via-[#d4af37] to-[#0a2f1c]"></div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               {/* Controls */}
               <div className="space-y-8 flex flex-col justify-start">
-                
-                {/* Plan Selection */}
+                {/* Plot Size */}
                 <div>
-                   <label className="block text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4">
-                    1. Choose Payment Plan
+                  <label className="block text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4">
+                    1. Select Plot Size
                   </label>
                   <div className="flex flex-wrap gap-3">
-                    <button 
-                      onClick={() => setPlan('outright')} 
-                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === 'outright' ? 'bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    {(["150sqm", "180sqm", "200sqm"] as const).map((size) => (
+                      <button
+                        key={size}
+                        onClick={() => setPlotSize(size)}
+                        className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plotSize === size ? "bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"}`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Plan */}
+                <div>
+                  <label className="block text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4">
+                    2. Choose Payment Plan
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setPlan("outright")}
+                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === "outright" ? "bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"}`}
                     >
                       Outright
                     </button>
-                    <button 
-                      onClick={() => setPlan('monthly')} 
-                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === 'monthly' ? 'bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    <button
+                      onClick={() => setPlan("6_months")}
+                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === "6_months" ? "bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"}`}
                     >
                       6 Months
                     </button>
-                    <button 
-                      onClick={() => setPlan('weekly')} 
-                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === 'weekly' ? 'bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'}`}
+                    <button
+                      onClick={() => setPlan("weekly")}
+                      className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all border ${plan === "weekly" ? "bg-[#0a2f1c] text-white border-[#0a2f1c] shadow-md" : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"}`}
                     >
-                      Weekly
+                      Weekly Plan
                     </button>
                   </div>
-
-                  {/* --- NEW: COMPLIANT OUTRIGHT BONUS CALLOUT --- */}
-                  <div className={`mt-4 p-4 rounded-xl border transition-all duration-300 flex items-start gap-3 ${plan === 'outright' ? 'bg-[#d4af37]/10 border-[#d4af37]/30' : 'bg-slate-50 border-slate-100 opacity-60'}`}>
-                    <span className={`material-icons-round text-xl shrink-0 ${plan === 'outright' ? 'text-[#d4af37]' : 'text-slate-400'}`}>
-                      workspace_premium
-                    </span>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      <strong className={plan === 'outright' ? 'text-[#0a2f1c]' : 'text-slate-500'}>Outright Bonus:</strong> Pay outright to qualify for premium annual crop yields and land appreciation benefits.
-                    </p>
-                  </div>
-
                 </div>
 
-                {/* Plot Slider */}
+                {/* Units */}
                 <div>
                   <label
                     className="block text-sm font-semibold uppercase tracking-wider text-slate-500 mb-4"
                     htmlFor="investment-slider"
                   >
-                    2. Select Number of Plots (500sqm each)
+                    3. Select Number of Plots
                   </label>
                   <div className="flex items-baseline gap-2 mb-6">
                     <span className="text-5xl font-bold text-[#0a2f1c] tracking-tight">
-                      {plots}
+                      {units}
                     </span>
                     <span className="text-xl text-slate-400 font-['Playfair_Display',_serif]">
-                      {plots === 1 ? 'Plot' : 'Plots'}
+                      {units === 1 ? "Plot" : "Plots"}
                     </span>
                   </div>
 
@@ -237,11 +290,11 @@ export default function Main() {
                     <input
                       type="range"
                       id="investment-slider"
-                      min={minPlots}
-                      max={maxPlots}
+                      min={1}
+                      max={5}
                       step="1"
-                      value={plots}
-                      onChange={(e) => setPlots(Number(e.target.value))}
+                      value={units}
+                      onChange={(e) => setUnits(Number(e.target.value))}
                       className="bugaking-slider z-20 relative w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer"
                     />
                     <div
@@ -251,23 +304,7 @@ export default function Main() {
                   </div>
                   <div className="flex justify-between mt-2 text-xs font-medium text-slate-400">
                     <span>1 Plot</span>
-                    <span>10 Plots</span>
-                  </div>
-                </div>
-
-                <div className="p-6 bg-slate-50 rounded-xl border border-slate-100 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#d4af37]/10 flex items-center justify-center flex-shrink-0">
-                    <span className="material-icons-round text-[#d4af37]">
-                      landscape
-                    </span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-[#0a2f1c]">
-                      AGIS Recertification
-                    </h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                      Your land is backed by verifiable documentation (Right of Occupancy) to guarantee your peace of mind.
-                    </p>
+                    <span>5 Plots</span>
                   </div>
                 </div>
               </div>
@@ -278,29 +315,31 @@ export default function Main() {
                   <div className="grid grid-cols-2 gap-6 border-b border-white/10 pb-6">
                     <div>
                       <p className="text-[10px] text-white/60 font-medium uppercase tracking-wider mb-1">
-                        Total Land Size
+                        Location
                       </p>
-                      <h3 className="text-xl font-bold text-white">
-                        <span>{formatCurrency(totalSqm)}</span> SQM
+                      <h3 className="text-lg font-bold text-white">
+                        Lugbe Aco
                       </h3>
                     </div>
                     <div>
                       <p className="text-[10px] text-white/60 font-medium uppercase tracking-wider mb-1">
-                        Purpose
+                        Plot Size
                       </p>
-                      <h3 className="text-sm mt-1 font-bold text-white">
-                        Strictly for Farming
+                      <h3 className="text-lg font-bold text-white">
+                        {plotSize}
                       </h3>
                     </div>
                   </div>
-                  
+
                   {plan !== "outright" && (
                     <div className="animate-in fade-in duration-300">
-                      <p className="text-xs text-[#0ff035]/80 font-medium uppercase tracking-wider mb-2">
-                        {plan === 'monthly' ? 'Monthly Payment (x6)' : 'Weekly Payment'}
+                      <p className="text-xs text-[#d4af37]/80 font-medium uppercase tracking-wider mb-2">
+                        {plan === "6_months"
+                          ? "Monthly Installment (6 Months)"
+                          : "Weekly Installment"}
                       </p>
                       <div className="flex items-center gap-3">
-                        <span className="material-icons-round text-[#0ff035] text-2xl">
+                        <span className="material-icons-round text-[#d4af37] text-2xl">
                           payments
                         </span>
                         <h3 className="text-3xl font-bold text-white">
@@ -324,29 +363,33 @@ export default function Main() {
                   <form className="space-y-4" onSubmit={handleWhatsApp}>
                     <div className="grid grid-cols-1 gap-3">
                       <input
-                        className="w-full bg-white/5 outline-none border border-white/20 text-white placeholder-white/40 text-sm rounded-lg focus:ring-1 focus:ring-[#0ff035] focus:border-[#0ff035] block p-3 transition-colors"
+                        className="w-full bg-white/5 outline-none border border-white/20 text-white placeholder-white/40 text-sm rounded-lg focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] block p-3 transition-colors"
                         placeholder="Full Name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         required
                         type="text"
                       />
                       <input
-                        className="w-full bg-white/5 outline-none border border-white/20 text-white placeholder-white/40 text-sm rounded-lg focus:ring-1 focus:ring-[#0ff035] focus:border-[#0ff035] block p-3 transition-colors"
+                        className="w-full bg-white/5 outline-none border border-white/20 text-white placeholder-white/40 text-sm rounded-lg focus:ring-1 focus:ring-[#d4af37] focus:border-[#d4af37] block p-3 transition-colors"
                         placeholder="WhatsApp Number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
                         required
                         type="tel"
                       />
                     </div>
                     <button
                       type="submit"
-                      className="w-full group bg-[#0ff035] hover:bg-[#0bc42a] transition-all duration-300 text-[#0a2f1c] font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(15,240,53,0.3)] hover:shadow-lg hover:-translate-y-0.5"
+                      className="w-full group bg-[#d4af37] hover:bg-[#c5a028] transition-all duration-300 text-[#0a2f1c] font-bold py-4 px-6 rounded-lg flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-lg hover:-translate-y-0.5"
                     >
                       <span className="uppercase tracking-widest text-xs sm:text-sm text-black whitespace-nowrap">
-                        Lock in this plan
+                        Get Official Brochure
                       </span>
                     </button>
                   </form>
-                  <p className="text-center text-[10px] text-white/30 mt-3 leading-tight">
-                    By submitting, our team will reach out via WhatsApp with your official subscription forms and payment details.
+                  <p className="text-center text-[10px] text-white/40 mt-3 leading-tight">
+                    Submit to continue to WhatsApp. We respect your privacy.
                   </p>
                 </div>
               </div>
@@ -359,10 +402,10 @@ export default function Main() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 sm:mb-8 flex flex-row items-end sm:items-center justify-between gap-4">
             <div className="flex-1">
               <h2 className="font-['Playfair_Display',_serif] font-bold text-2xl md:text-3xl text-[#0a2f1c] leading-tight">
-                Life on the Farm
+                The Vision
               </h2>
               <p className="text-sm text-slate-500 mt-1">
-                See your investment in action
+                Explore the proposed BugaKing Estate infrastructure
               </p>
             </div>
             <div className="flex gap-2 shrink-0">
@@ -388,93 +431,60 @@ export default function Main() {
             className="flex gap-4 sm:gap-6 overflow-x-auto px-4 sm:px-6 lg:px-8 pb-4 snap-x snap-mandatory scroll-smooth hide-scroll"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {/* Card 1 */}
-            <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group cursor-pointer">
+            {/* Card 1: Gatehouse / Render */}
+            <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group">
               <img
-                alt="Drone shot of corn fields"
+                alt="Estate Gatehouse Render"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&auto=format&fit=crop"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
+              <div className="absolute bottom-5 left-5 right-5">
+                <span className="text-xs font-bold text-[#d4af37] uppercase tracking-wider">
+                  Infrastructure
+                </span>
+                <h3 className="text-white font-['Playfair_Display',_serif] text-lg sm:text-xl mt-1">
+                  Secure Gated Entrance
+                </h3>
+              </div>
+            </div>
+
+            {/* Card 2: Aerial/Drone */}
+            <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group">
+              <img
+                alt="Aerial view of land"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="material-icons-round text-white text-3xl">
-                    play_circle
-                  </span>
-                </div>
-              </div>
               <div className="absolute bottom-5 left-5 right-5">
-                <span className="text-xs font-bold text-[#0ff035] uppercase tracking-wider">
-                  Drone View
+                <span className="text-xs font-bold text-[#d4af37] uppercase tracking-wider">
+                  Topography
                 </span>
                 <h3 className="text-white font-['Playfair_Display',_serif] text-lg sm:text-xl mt-1">
-                  Surveying Phase 1
+                  100% Dry & Level Land
                 </h3>
               </div>
             </div>
 
-            {/* Card 2 */}
+            {/* Card 3: Roads/Development */}
             <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group">
               <img
-                alt="Close up of healthy crops"
+                alt="Road network development"
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                src="https://images.unsplash.com/photo-1595822904886-f1c7136014ba?q=80&w=800&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1580041065738-e72023775cdc?q=80&w=800&auto=format&fit=crop"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
               <div className="absolute bottom-5 left-5 right-5">
                 <span className="text-xs font-bold text-[#d4af37] uppercase tracking-wider">
-                  Harvest
+                  Development
                 </span>
                 <h3 className="text-white font-['Playfair_Display',_serif] text-lg sm:text-xl mt-1">
-                  Maize Crop Yield
+                  Paved Road Networks
                 </h3>
               </div>
             </div>
 
-            {/* Card 3 */}
-            <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group cursor-pointer">
-              <img
-                alt="Farmers working in field"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=800&auto=format&fit=crop"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="material-icons-round text-white text-3xl">
-                    play_circle
-                  </span>
-                </div>
-              </div>
-              <div className="absolute bottom-5 left-5 right-5">
-                <span className="text-xs font-bold text-[#0ff035] uppercase tracking-wider">
-                  Team
-                </span>
-                <h3 className="text-white font-['Playfair_Display',_serif] text-lg sm:text-xl mt-1">
-                  Meet Our Agronomists
-                </h3>
-              </div>
-            </div>
-
-            {/* Card 4 */}
-            <div className="snap-center sm:snap-start shrink-0 w-[85vw] sm:w-[300px] lg:w-[340px] h-[360px] sm:h-[400px] lg:h-[460px] relative rounded-xl overflow-hidden group">
-              <img
-                alt="Tractor plowing field"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                src="https://images.unsplash.com/photo-1621252179027-94459d278660?q=80&w=800&auto=format&fit=crop"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90"></div>
-              <div className="absolute bottom-5 left-5 right-5">
-                <span className="text-xs font-bold text-[#d4af37] uppercase tracking-wider">
-                  Machinery
-                </span>
-                <h3 className="text-white font-['Playfair_Display',_serif] text-lg sm:text-xl mt-1">
-                  Mechanized Farming
-                </h3>
-              </div>
-            </div>
-
-            {/* Spacer element */}
             <div className="shrink-0 w-[1px] sm:hidden"></div>
           </div>
         </section>
@@ -489,7 +499,7 @@ export default function Main() {
           <div className="space-y-4">
             <details className="group bg-white rounded-lg border border-slate-200 overflow-hidden">
               <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-5 text-[#0a2f1c]">
-                <span>How is my land secured?</span>
+                <span>What is the title on the land?</span>
                 <span className="transition group-open:rotate-180">
                   <svg
                     className="fill-none h-5 w-5 stroke-current"
@@ -503,12 +513,13 @@ export default function Main() {
                 </span>
               </summary>
               <div className="text-slate-600 p-5 pt-0 text-sm leading-relaxed">
-                Your investment is highly secure. The estate comes with AGIS Recertification and an R of O (Right of Occupancy), meaning the land is officially registered and recognized by the government.
+                The land is covered by a Right of Occupancy (R of O). It is 100%
+                free from government acquisition and adverse claims.
               </div>
             </details>
             <details className="group bg-white rounded-lg border border-slate-200 overflow-hidden">
               <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-5 text-[#0a2f1c]">
-                <span>Can I build a house on this land?</span>
+                <span>Are there other statutory fees?</span>
                 <span className="transition group-open:rotate-180">
                   <svg
                     className="fill-none h-5 w-5 stroke-current"
@@ -522,12 +533,15 @@ export default function Main() {
                 </span>
               </summary>
               <div className="text-slate-600 p-5 pt-0 text-sm leading-relaxed">
-                No, this estate is designated **strictly for farming**. This zoning ensures a dedicated, productive agricultural environment free from residential disruptions.
+                Yes. Like all authentic estate purchases, statutory fees apply.
+                This includes the Deed of Assignment, Survey Fee, and Estate
+                Development Levy. These will be clearly stated in your offer
+                letter.
               </div>
             </details>
             <details className="group bg-white rounded-lg border border-slate-200 overflow-hidden">
               <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-5 text-[#0a2f1c]">
-                <span>Can I visit the farm?</span>
+                <span>When can I start building?</span>
                 <span className="transition group-open:rotate-180">
                   <svg
                     className="fill-none h-5 w-5 stroke-current"
@@ -541,26 +555,50 @@ export default function Main() {
                 </span>
               </summary>
               <div className="text-slate-600 p-5 pt-0 text-sm leading-relaxed">
-                Absolutely! We organize regular site visits for investors to Kuje, Abuja. You can also schedule a private inspection tour by contacting our support team via WhatsApp.
+                You get physical allocation of your plot once full payment for
+                the land and statutory fees have been made. You can commence
+                building immediately after allocation.
+              </div>
+            </details>
+            <details className="group bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <summary className="flex justify-between items-center font-medium cursor-pointer list-none p-5 text-[#0a2f1c]">
+                <span>Can I schedule a physical inspection?</span>
+                <span className="transition group-open:rotate-180">
+                  <svg
+                    className="fill-none h-5 w-5 stroke-current"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M6 9l6 6 6-6"></path>
+                  </svg>
+                </span>
+              </summary>
+              <div className="text-slate-600 p-5 pt-0 text-sm leading-relaxed">
+                Absolutely! We organize site visits so you can verify the
+                location and topography yourself. Hit the WhatsApp button to
+                book a date with our realtors.
               </div>
             </details>
           </div>
         </section>
 
         {/* --- FOOTER CTA --- */}
-        <section className="w-full bg-[#0a2f1c] text-white py-16 px-4 rounded-t-[3rem] shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#0ff035]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <section className="w-full bg-[#0a2f1c] text-white py-16 px-4 rounded-t-[3rem] shadow-2xl relative overflow-hidden mt-12">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#d4af37]/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
           <div className="max-w-3xl mx-auto text-center relative z-10 space-y-8">
             <h2 className="font-['Playfair_Display',_serif] text-3xl md:text-4xl font-bold leading-tight">
-              Ready to Start Your Agricultural Journey?
+              Ready to Claim Your Land?
             </h2>
             <p className="text-white/80 max-w-xl mx-auto">
-              Secure your 500sqm plots today and lock in our flexible payment plans.
+              Secure your plot today and step into the investment you deserve
+              with our tailored payment structures.
             </p>
             <button
               onClick={() => handleWhatsApp()}
-              className="bg-[#0ff035] hover:bg-[#0bc42a] text-[#0a2f1c] font-bold py-4 px-10 rounded-full shadow-[0_0_20px_rgba(15,240,53,0.3)] transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 text-lg"
+              className="bg-[#d4af37] hover:bg-[#c5a028] text-[#0a2f1c] font-bold py-4 px-10 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all duration-300 hover:scale-105 inline-flex items-center gap-2 text-lg"
             >
               <span>Chat with us on WhatsApp</span>
             </button>
