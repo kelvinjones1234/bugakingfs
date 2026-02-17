@@ -79,7 +79,7 @@ export default function Main() {
 
       {/* --- HERO SECTION --- */}
       <header className="text-center max-w-4xl mx-auto space-y-6 mb-[5rem] mt-[10rem] px-4">
-        <div className="inline-block bg-[#0a2f1c]/10 text-[#0a2f1c] font-bold px-4 py-1.5 rounded-full text-sm mb-2 border border-[#0a2f1c]/20">
+        <div className="inline-block bg-[#0a2f1c]/10 text-[#0a2f1c] font-bold px-4 py-1 rounded-full text-xs border border-[#0a2f1c]/20">
           📍 Kuje - Abuja
         </div>
         <h1 className="font-['Playfair_Display',_serif] font-bold text-4xl md:text-6xl lg:text-7xl text-[#0a2f1c] leading-[1.1]">
@@ -108,7 +108,7 @@ export default function Main() {
 
       <main className="w-full mx-auto flex flex-col items-center gap-20 bg-[#fcfdfc]">
         {/* --- FEATURES STRIP --- */}
-        <section className="w-full bg-[#0a2f1c] text-white px-4 relative overflow-hidden">
+        <section className="w-full bg-[#0a2f1c] text-white py-12 px-4 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10"
             style={{
@@ -231,7 +231,7 @@ export default function Main() {
                       step="1"
                       value={plots}
                       onChange={(e) => setPlots(Number(e.target.value))}
-                      className="bugaking-slider z-20 relative w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                      className="bugaking-slider z-20 relative w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer"
                     />
                     <div
                       className="absolute left-0 top-1/2 -translate-y-1/2 h-2 bg-[#0a2f1c] rounded-l-lg pointer-events-none transition-all duration-150"
@@ -346,7 +346,7 @@ export default function Main() {
         </section>
 
         {/* --- GALLERY CAROUSEL --- */}
-        <section className="w-full sm:py-16 bg-slate-50 overflow-hidden">
+        <section className="w-full sm:py-12 bg-slate-50 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6 sm:mb-8 flex flex-row items-end sm:items-center justify-between gap-4">
             <div className="flex-1">
               <h2 className="font-['Playfair_Display',_serif] font-bold text-2xl md:text-3xl text-[#0a2f1c] leading-tight">
@@ -471,7 +471,7 @@ export default function Main() {
         </section>
 
         {/* --- FAQ --- */}
-        <section className="w-full max-w-3xl px-4 mx-auto py-[3rem]">
+        <section className="w-full max-w-3xl px-4 mx-auto">
           <div className="text-center mb-10">
             <h2 className="font-['Playfair_Display',_serif] font-bold text-2xl md:text-3xl text-[#0a2f1c]">
               Frequently Asked Questions
@@ -539,7 +539,7 @@ export default function Main() {
         </section>
 
         {/* --- FOOTER CTA --- */}
-        <section className="w-full bg-[#0a2f1c] text-white py-16 px-4 rounded-t-[3rem] shadow-2xl relative overflow-hidden mt-[3rem]">
+        <section className="w-full bg-[#0a2f1c] text-white py-16 px-4 rounded-t-[3rem] shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#0ff035]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#d4af37]/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
           <div className="max-w-3xl mx-auto text-center relative z-10 space-y-8">
