@@ -1,26 +1,19 @@
 "use client";
 
-import { CldImage } from "next-cloudinary";
 import React, { useEffect, useState } from "react";
+import { CldImage } from "next-cloudinary";
 import {
   Wallet,
   ShieldCheck,
-  Leaf,
-  Factory,
-  Landmark,
+  Briefcase,
   ArrowRight,
   LucideIcon,
-  Briefcase,
-  MapPin,
-  Home,
   ZoomIn,
   X,
 } from "lucide-react";
 import ProjectDetailModal from "./ProjectDetailModal";
 
-// -----------------------------------------------------------------------------
-// 1. TYPE DEFINITIONS
-// -----------------------------------------------------------------------------
+// --- 1. TYPE DEFINITIONS & PROPS ---
 
 export interface PricingOption {
   id: string;
@@ -51,9 +44,7 @@ interface MainProps {
   initialProjects: InvestmentProject[];
 }
 
-// -----------------------------------------------------------------------------
-// 2. Helper Functions & Theme Logic
-// -----------------------------------------------------------------------------
+// --- 2. Helper Functions ---
 
 const formatCurrency = (amount: string | number) => {
   return new Intl.NumberFormat("en-NG", {
@@ -64,67 +55,46 @@ const formatCurrency = (amount: string | number) => {
   }).format(Number(amount));
 };
 
+// --- 3. Icon & Theme Logic ---
+
 interface ThemeIconData {
   Icon: LucideIcon;
   label: string;
   val: string;
 }
 
-const getProjectTheme = (
-  type: string,
-  roi: number,
-  location: string,
-  assetType?: string,
-) => {
-  let icons: ThemeIconData[];
+const getProjectTheme = (type: string, roi: string | number) => {
   let gradient: string;
   let accentColor: string;
 
-  const normalizedType = type.toLowerCase().replace("_", "-");
-
-  if (normalizedType === "real-estate") {
-    icons = [
-      { Icon: MapPin, label: "Location", val: location || "Prime Area" },
-      {
-        Icon: Home,
-        label: "Asset Type",
-        val: assetType || "Tangible Property",
-      },
-      { Icon: Briefcase, label: "Ownership", val: "Verified Title" },
-    ];
+  if (type === "real-estate") {
     gradient =
       "bg-[linear-gradient(135deg,rgba(208,165,57,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-[#d0a539]";
   } else if (
-    normalizedType.includes("agro") ||
-    normalizedType.includes("farm") ||
-    normalizedType === "agriculture"
+    type.toLowerCase().includes("agro") ||
+    type.toLowerCase().includes("farm")
   ) {
-    icons = [
-      { Icon: Leaf, label: "Harvest Cycle", val: `${roi}% Post-Harvest` },
-      { Icon: Factory, label: "Operations", val: "AI Monitoring" },
-      { Icon: Landmark, label: "Backing", val: "Govt Supported" },
-    ];
     gradient =
       "bg-[linear-gradient(135deg,rgba(72,187,120,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-green-600";
   } else {
-    icons = [
-      { Icon: Wallet, label: "Steady Returns", val: `${roi}% Annual Yield` },
-      { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
-      { Icon: Briefcase, label: "Security", val: "Insured Capital" },
-    ];
     gradient =
       "bg-[linear-gradient(135deg,rgba(208,165,57,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-[#d0a539]";
   }
 
+  // Universally applied features
+  const icons: ThemeIconData[] = [
+    { Icon: Wallet, label: "Steady Returns", val: `${roi}% Annual Yield` },
+    { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
+    { Icon: Briefcase, label: "Security", val: "Insured Capital" },
+  ];
+
   return { icons, gradient, accentColor };
 };
 
-// -----------------------------------------------------------------------------
-// 3. Main Component
-// -----------------------------------------------------------------------------
+// --- 4. Main Component ---
 
 const Main = ({ initialProjects }: MainProps) => {
   const [projects] = useState<InvestmentProject[]>(initialProjects);
@@ -171,7 +141,7 @@ const Main = ({ initialProjects }: MainProps) => {
     }
   }, [projects]);
 
-  // Filter Logic (Handles REAL_ESTATE vs real-estate)
+  // Filter Logic
   const filteredProjects = projects.filter((project) => {
     if (filterType === "all") return true;
     const normalizedType = project.investment_type
@@ -180,14 +150,14 @@ const Main = ({ initialProjects }: MainProps) => {
     return normalizedType === filterType;
   });
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   const handleOpenModal = (project: InvestmentProject) => {
     setSelectedProject(project);
     setPreSelectedPlanId(null);
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -229,7 +199,7 @@ const Main = ({ initialProjects }: MainProps) => {
       )}
 
       <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 py-10">
-        {/* Page Title & Controls */}
+        {/* Page Title & Controls - Updated with requested styling */}
         <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 bg-white p-6 sm:p-8 rounded-2xl border border-[#171512]/5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.03)]">
           <div>
             <span className="text-[#d0a539] text-[10px] sm:text-xs font-black uppercase tracking-[0.4em] mb-2 block">
@@ -254,34 +224,27 @@ const Main = ({ initialProjects }: MainProps) => {
         </div>
 
         {/* Project List */}
-        <div className="space-y-6 lg:space-y-8">
+        <div className="space-y-6">
           {filteredProjects.length > 0 ? (
             filteredProjects.map((project) => {
-              const normalizedType = project.investment_type
-                .toLowerCase()
-                .replace("_", "-");
-              const isRealEstate = normalizedType === "real-estate";
+              const { icons, gradient, accentColor } = getProjectTheme(
+                project.investment_type,
+                project.expected_roi_percent,
+              );
               const isSoldOut = !project.active;
               const imageSrc =
                 project.project_img || "https://placehold.co/600x400";
 
-              const { icons, gradient, accentColor } = getProjectTheme(
-                project.investment_type,
-                project.expected_roi_percent,
-                project.location,
-                project.asset_type,
-              );
-
               return (
                 <div
                   key={project.id}
-                  className={`group bg-white border border-[#171512]/5 rounded-2xl overflow-hidden flex flex-col xl:flex-row transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-[#d0a539]/20 relative ${gradient} ${
-                    isSoldOut ? "opacity-75 grayscale-[40%]" : ""
+                  className={`group bg-white border border-[#171512]/5 rounded-2xl overflow-hidden flex flex-col xl:flex-row transition-all hover:shadow-2xl hover:shadow-[#d0a539]/5 hover:border-[#d0a539]/20 relative ${gradient} ${
+                    isSoldOut ? "opacity-80 grayscale-[50%]" : ""
                   }`}
                 >
-                  {/* Image Section (Clickable) */}
+                  {/* Image Section */}
                   <div
-                    className="w-full xl:w-[320px] h-56 sm:h-72 xl:h-auto flex-shrink-0 relative cursor-zoom-in overflow-hidden"
+                    className="w-full xl:w-72 h-64 xl:h-auto flex-shrink-0 relative overflow-hidden bg-[#171512]/5 cursor-zoom-in"
                     onClick={() => setFullScreenImage(imageSrc)}
                   >
                     <div className="absolute inset-0 bg-[#171512]/20 group-hover:bg-[#171512]/40 transition-colors duration-300 z-10 flex items-center justify-center">
@@ -296,7 +259,8 @@ const Main = ({ initialProjects }: MainProps) => {
                         alt={project.name}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         crop="fill"
-                        sizes="(max-width: 1280px) 100vw, 320px"
+                        gravity="auto"
+                        sizes="(max-width: 1280px) 100vw, 288px"
                       />
                     ) : (
                       <img
@@ -306,7 +270,7 @@ const Main = ({ initialProjects }: MainProps) => {
                       />
                     )}
 
-                    {/* Status Badge Over Image on Mobile */}
+                    {/* Status Badge Over Image */}
                     {isSoldOut && (
                       <div className="absolute top-4 left-4 z-20 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg">
                         Sold Out
@@ -315,34 +279,29 @@ const Main = ({ initialProjects }: MainProps) => {
                   </div>
 
                   {/* Info Section */}
-                  <div className="flex-grow p-6 sm:p-8 flex flex-col justify-center border-b xl:border-b-0 xl:border-r border-[#171512]/5">
-                    <div className="mb-6 sm:mb-8">
+                  <div className="flex-grow p-8 flex flex-col justify-center border-b xl:border-b-0 xl:border-r border-[#171512]/5">
+                    <div className="mb-6">
                       <span
-                        className={`text-[9px] sm:text-[10px] font-black uppercase tracking-[0.3em] ${accentColor}`}
+                        className={`text-[10px] font-black uppercase tracking-[0.3em] ${accentColor}`}
                       >
                         {project.category_display ||
                           project.investment_type.replace("_", " ")}
                       </span>
-                      <h3 className="text-md sm:text-xl font-black uppercase tracking-tight mt-1.5 text-[#171512] leading-tight">
+                      <h3 className="text-lg md:text-xl font-black uppercase tracking-tight mt-1 text-[#171512]">
                         {project.name}
                       </h3>
                     </div>
 
                     {/* Features Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       {icons.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-2.5 sm:gap-3"
-                        >
-                          <item.Icon
-                            className={`w-4 h-4 sm:w-5 sm:h-5 mt-0.5 ${accentColor} shrink-0`}
-                          />
-                          <div className="min-w-0">
-                            <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-[#171512]/40 truncate">
+                        <div key={idx} className="flex items-start gap-3">
+                          <item.Icon className={`w-5 h-5 ${accentColor}`} />
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-[#171512]/40">
                               {item.label}
                             </p>
-                            <p className="text-xs sm:text-sm font-bold text-[#171512] capitalize truncate">
+                            <p className="text-sm font-bold text-[#171512] capitalize">
                               {item.val}
                             </p>
                           </div>
@@ -351,61 +310,58 @@ const Main = ({ initialProjects }: MainProps) => {
                     </div>
                   </div>
 
-                  {/* Pricing / Action Section */}
-                  <div className="xl:w-[400px] p-6 sm:p-8 flex flex-col justify-between bg-[#f8f7f6]/50">
-                    <div className="mb-6">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-[#171512]/40 mb-4 pb-2 border-b border-[#171512]/10">
-                        Available Entry Plans
-                      </h4>
-
-                      <div className="space-y-3">
-                        {project.pricing_options.slice(0, 3).map((option) => (
-                          <div
+                  {/* Action / Pricing Section */}
+                  <div className="xl:w-[450px] p-8 flex flex-col justify-between bg-[#171512]/5">
+                    <table className="w-full mb-6">
+                      <thead>
+                        <tr className="text-[10px] font-black uppercase tracking-widest text-[#171512]/40 border-b border-[#171512]/10">
+                          <th className="pb-2 text-left">Plan</th>
+                          <th className="pb-2 text-right">Min. Entry</th>
+                          <th className="pb-2 text-right">ROI</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {project.pricing_options.slice(0, 2).map((option) => (
+                          <tr
                             key={option.id}
-                            className="flex items-center justify-between text-sm group/plan"
+                            className="border-b border-[#171512]/5 last:border-0"
                           >
-                            <div className="flex items-center gap-2">
-                              <div
-                                className={`w-1.5 h-1.5 rounded-full bg-[#171512]/20 group-hover/plan:bg-[#d0a539] transition-colors`}
-                              />
-                              <span className="font-bold text-[#171512]/70 capitalize truncate max-w-[120px] sm:max-w-[160px]">
-                                {option.plan_name}
-                              </span>
-                            </div>
-                            <div className="text-right">
-                              <span className="font-black text-[#171512]">
-                                {formatCurrency(option.minimum_deposit)}
-                              </span>
-                              {!isRealEstate && option.roi_start_display && (
-                                <span className="block text-[9px] font-bold text-[#d0a539] uppercase tracking-wider mt-0.5">
-                                  {option.roi_start_display}
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                            <td className="py-3 font-semibold text-[#171512] capitalize truncate max-w-[100px]">
+                              {option.plan_name}
+                            </td>
+                            <td className="py-3 text-right font-black text-[#171512]">
+                              {formatCurrency(option.minimum_deposit)}
+                            </td>
+                            <td className="py-3 text-right text-[#171512]/70">
+                              {option.roi_start_display ||
+                                `${project.expected_roi_percent}%`}
+                            </td>
+                          </tr>
                         ))}
-
                         {project.pricing_options.length === 0 && (
-                          <div className="text-center py-4 bg-white rounded-lg border border-dashed border-[#171512]/10">
-                            <p className="text-xs font-bold text-[#171512]/40 uppercase tracking-widest">
-                              Pricing TBD
-                            </p>
-                          </div>
+                          <tr>
+                            <td
+                              colSpan={3}
+                              className="py-3 text-center text-xs italic opacity-50"
+                            >
+                              Pricing details unavailable
+                            </td>
+                          </tr>
                         )}
-                      </div>
-                    </div>
+                      </tbody>
+                    </table>
 
-                    <div className="mt-auto pt-4">
+                    <div className="space-y-4 w-full">
                       <button
                         onClick={() => handleOpenModal(project)}
                         disabled={isSoldOut}
-                        className={`w-full flex justify-center items-center gap-2 px-6 py-3.5 rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest transition-all ${
+                        className={`flex justify-center w-full pl-8 pr-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-transform whitespace-nowrap items-center gap-2 ${
                           isSoldOut
                             ? "bg-[#171512]/10 text-[#171512]/40 cursor-not-allowed"
-                            : "bg-[#d0a539] text-[#171512] hover:bg-[#171512] hover:text-[#d0a539] shadow-lg shadow-[#d0a539]/20 hover:shadow-xl hover:-translate-y-0.5"
+                            : "bg-[#d0a539] text-[#171512] hover:scale-105 shadow-lg shadow-[#d0a539]/20"
                         }`}
                       >
-                        {isSoldOut ? "Currently Unavailable" : "View & Invest"}
+                        {isSoldOut ? "Currently Unavailable" : "Invest Now"}
                         {!isSoldOut && <ArrowRight className="w-4 h-4" />}
                       </button>
                     </div>
