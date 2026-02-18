@@ -13,4 +13,4 @@ export default async function Page() {
       <Main data={investmentData} />
     </>
   );
-}
+} 

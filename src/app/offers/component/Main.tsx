@@ -66,11 +66,17 @@ interface ThemeIconData {
 const getProjectTheme = (type: string, roi: string | number) => {
   let gradient: string;
   let accentColor: string;
+  let icons: ThemeIconData[];
 
   if (type === "real-estate") {
     gradient =
       "bg-[linear-gradient(135deg,rgba(208,165,57,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-[#d0a539]";
+    icons = [
+      { Icon: Wallet, label: "Asset Growth", val: "Capital Appreciation" }, // Replaced Yield/Return
+      { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
+      { Icon: Briefcase, label: "Security", val: "Insured Capital" },
+    ];
   } else if (
     type.toLowerCase().includes("agro") ||
     type.toLowerCase().includes("farm")
@@ -78,22 +84,24 @@ const getProjectTheme = (type: string, roi: string | number) => {
     gradient =
       "bg-[linear-gradient(135deg,rgba(72,187,120,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-green-600";
+    icons = [
+      { Icon: Wallet, label: "Steady Returns", val: `${roi}% Annual Yield` },
+      { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
+      { Icon: Briefcase, label: "Security", val: "Insured Capital" },
+    ];
   } else {
     gradient =
       "bg-[linear-gradient(135deg,rgba(208,165,57,0.05)_0%,rgba(26,26,26,0)_100%)]";
     accentColor = "text-[#d0a539]";
+    icons = [
+      { Icon: Wallet, label: "Steady Returns", val: `${roi}% Annual Yield` },
+      { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
+      { Icon: Briefcase, label: "Security", val: "Insured Capital" },
+    ];
   }
-
-  // Universally applied features
-  const icons: ThemeIconData[] = [
-    { Icon: Wallet, label: "Steady Returns", val: `${roi}% Annual Yield` },
-    { Icon: ShieldCheck, label: "Managed Assets", val: "Full Maintenance" },
-    { Icon: Briefcase, label: "Security", val: "Insured Capital" },
-  ];
 
   return { icons, gradient, accentColor };
 };
-
 // --- 4. Main Component ---
 
 const Main = ({ initialProjects }: MainProps) => {
@@ -317,7 +325,12 @@ const Main = ({ initialProjects }: MainProps) => {
                         <tr className="text-[10px] font-black uppercase tracking-widest text-[#171512]/40 border-b border-[#171512]/10">
                           <th className="pb-2 text-left">Plan</th>
                           <th className="pb-2 text-right">Min. Entry</th>
-                          <th className="pb-2 text-right">ROI</th>
+                          {/* 👇 Conditionally change the ROI Header */}
+                          <th className="pb-2 text-right">
+                            {project.investment_type === "real-estate"
+                              ? "Growth"
+                              : "ROI"}
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="text-sm">
@@ -332,9 +345,12 @@ const Main = ({ initialProjects }: MainProps) => {
                             <td className="py-3 text-right font-black text-[#171512]">
                               {formatCurrency(option.minimum_deposit)}
                             </td>
+                            {/* 👇 Conditionally change the ROI Value */}
                             <td className="py-3 text-right text-[#171512]/70">
-                              {option.roi_start_display ||
-                                `${project.expected_roi_percent}%`}
+                              {project.investment_type === "real-estate"
+                                ? option.roi_start_display || "High Equity"
+                                : option.roi_start_display ||
+                                  `${project.expected_roi_percent}%`}
                             </td>
                           </tr>
                         ))}

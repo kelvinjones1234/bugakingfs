@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       const { metadata, amount, reference } = event.data;
       
       const investmentId = metadata?.investment_id;
+      const scheduleId = metadata?.schedule_id; // 👈 Extract exact schedule ID sent from frontend
 
       if (investmentId) {
         console.log(`💰 Payment received for Investment: ${investmentId}`);
@@ -39,7 +40,6 @@ export async function POST(req: Request) {
           where: { id: investmentId },
           include: { 
             schedules: true,
-            // 👇 Added this to fetch project location for the Transaction record
             selectedOption: {
               include: {
                 project: true
@@ -49,10 +49,19 @@ export async function POST(req: Request) {
         });
 
         if (investment) {
-          // B. Find the correct schedule to pay
-          const scheduleToUpdate = investment.schedules
-            .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-            .find(s => s.status === "UPCOMING" || s.status === "OVERDUE");
+          // B. Find the exact schedule to pay
+          let scheduleToUpdate;
+
+          if (scheduleId) {
+            // 🌟 PRIMARY METHOD: Use the exact ID from the frontend metadata
+            scheduleToUpdate = investment.schedules.find(s => s.id === scheduleId);
+          } else {
+            // 🛡️ FALLBACK: If schedule_id is missing, use chronological sorting 
+            // (Fixed to include "PENDING" so it stops skipping the first payment!)
+            scheduleToUpdate = investment.schedules
+              .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+              .find(s => s.status === "PENDING" || s.status === "UPCOMING" || s.status === "OVERDUE");
+          }
 
           if (scheduleToUpdate) {
             const paidAmount = amount / 100; // Convert Kobo to Base Currency
@@ -66,8 +75,8 @@ export async function POST(req: Request) {
                 data: {
                   status: "PAID",
                   datePaid: new Date(),
-                  proofOfPayment: `Paystack Ref: ${reference}`,
-                  amount: paidAmount 
+                  proofOfPayment: `Paystack Ref: ${reference}`
+                  // Removed amount: paidAmount override here so it doesn't overwrite the schedule's expected value
                 }
               });
 
@@ -83,13 +92,12 @@ export async function POST(req: Request) {
                 }
               });
 
-              // 3. Create Transaction Record (NEW)
+              // 3. Create Transaction Record
               await tx.transaction.create({
                 data: {
                   userId: investment.userId,
                   investmentId: investment.id,
                   amount: paidAmount,
-                  // Snapshot the location from the project
                   location: investment.selectedOption.project.location, 
                   installmentNumber: scheduleToUpdate.installmentNumber,
                   paymentReference: reference,

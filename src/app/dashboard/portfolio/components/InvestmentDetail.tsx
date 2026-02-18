@@ -4,7 +4,6 @@ import React, { useEffect, useState, useMemo, memo } from "react";
 // 1. Import CldImage
 import { CldImage } from "next-cloudinary";
 import {
-  FileText,
   MapPin,
   CalendarClock,
   Clock,
@@ -261,7 +260,7 @@ const InvestmentDetail = ({ id, onBack }: DetailProps) => {
         </div>
       </header>
 
-      <div className="space-y-8 max-w-7xl mx-auto">
+      <div className="space-y-8 mx-auto">
         {/* Top Section: Overview Card */}
         <div className="bg-white rounded-[2rem] border border-[#171512]/5 shadow-sm overflow-hidden">
           <div className="flex flex-col lg:flex-row">

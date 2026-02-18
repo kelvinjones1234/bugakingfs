@@ -98,7 +98,7 @@ const SignInForm = () => {
 
         if (investmentResult.success) {
           localStorage.removeItem("pending_investment");
-          router.push(`/dashboard/porfolio`);
+          router.push(`/dashboard/portfolio`);
           router.refresh();
           return;
         } else {

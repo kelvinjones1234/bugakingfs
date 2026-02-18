@@ -226,7 +226,7 @@ export const Main = () => {
     };
     fetchData();
   }, []);
-
+ 
   if (selectedInvestmentId !== null) {
     return (
       <div className="p-4 md:p-6 lg:p-10 min-h-screen bg-[#f8f7f6] pt-20 md:pt-[5rem] lg:pt-5">

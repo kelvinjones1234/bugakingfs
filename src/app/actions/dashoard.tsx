@@ -6,15 +6,15 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 
 export async function getDashboardStats() {
-  // 👇 2. Pass authOptions into getServerSession
+  // 1. Authenticate and get userId
   const session = await getServerSession(authOptions);
   
   if (!session?.user) throw new Error("Unauthorized");
   const userId = (session.user as any).id;
 
-  // 1. Fetch User's Investments with schedules (Perfectly scoped to the logged-in user)
+  // 2. Fetch User's Investments (Needed for portfolio mapping and ROI stats)
   const investments = await prisma.clientInvestment.findMany({
-    where: { userId: userId }, // 👈 This guarantees only their data is fetched
+    where: { userId: userId },
     include: { 
       selectedOption: { include: { project: true } },
       schedules: {
@@ -23,7 +23,7 @@ export async function getDashboardStats() {
     }
   });
 
-  // 2. Calculate Stats
+  // 3. Calculate Global Stats
   const totalInvested = investments.reduce((sum, inv) => sum + inv.amountPaid, 0);
   const portfolioValue = investments.reduce((sum, inv) => sum + inv.agreedAmount, 0);
 
@@ -31,55 +31,55 @@ export async function getDashboardStats() {
     ? ((portfolioValue - totalInvested) / totalInvested) * 100 
     : 0;
 
-  // 3. Find next payment due from investments with PAYING status
-  let nextPayment = null;
-  const payingInvestments = investments.filter(inv => inv.status === "PAYING");
-
-  if (payingInvestments.length > 0) {
-    const investmentsWithProgress = payingInvestments.map(inv => {
-      const totalSchedules = inv.schedules.length;
-      const paidSchedules = inv.schedules.filter(s => s.status === "PAID").length;
-      const progress = totalSchedules > 0 ? (paidSchedules / totalSchedules) * 100 : 0;
-      
-      const nextSchedule = inv.schedules.find(
-        s => s.status === "UPCOMING" || s.status === "PENDING" || s.status === "OVERDUE"
-      );
-
-      return { investment: inv, progress, nextSchedule };
-    });
-
-    const investmentsWithNextPayment = investmentsWithProgress.filter(
-      item => item.nextSchedule !== undefined
-    );
-
-    if (investmentsWithNextPayment.length > 0) {
-      investmentsWithNextPayment.sort((a, b) => b.progress - a.progress);
-      const mostProgressedInvestment = investmentsWithNextPayment[0];
-      const nextSchedule = mostProgressedInvestment.nextSchedule!;
-
-      const today = new Date();
-      const dueDate = new Date(nextSchedule.dueDate);
-      const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-      nextPayment = {
-        amount: nextSchedule.amount,
-        daysLeft: daysLeft > 0 ? daysLeft : 0,
-        dueDate: nextSchedule.dueDate.toISOString()
-      };
+  // 4. Compute nextPayment correctly using Prisma
+  const nextSchedule = await prisma.paymentSchedule.findFirst({
+    where: {
+      investment: {
+        userId: userId,
+        status: { in: ["PENDING", "PAYING"] } // Include PENDING to catch brand new plans!
+      },
+      status: {
+        in: ["UPCOMING", "PENDING", "OVERDUE"] // Look for any unpaid status
+      }
+    },
+    orderBy: {
+      dueDate: 'asc' // Chronologically closest schedule across all properties
     }
+  });
+
+  let nextPayment = null;
+  if (nextSchedule) {
+    const today = new Date();
+    const dueDate = new Date(nextSchedule.dueDate);
+
+    // Normalize both dates to midnight to get a strict "day" difference 
+    // This prevents hours/minutes from throwing off the calculation.
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const dueMidnight = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+
+    const diffTime = dueMidnight.getTime() - todayMidnight.getTime();
+    const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    nextPayment = {
+      amount: nextSchedule.amount,
+      daysLeft: daysLeft < 0 ? 0 : daysLeft, // If it's negative (overdue), display 0
+      dueDate: nextSchedule.dueDate.toISOString()
+    };
   }
 
-  // 4. Get Recent Transactions (Perfectly scoped to the logged-in user)
+  // 5. Get Recent Transactions 
+  // (Note: Currently mapping from PaymentSchedule as per your original code. 
+  // You can update this to use the new `prisma.transaction` model in the future if desired)
   const recentTransactions = await prisma.paymentSchedule.findMany({
     where: { 
-      investment: { userId: userId }, // 👈 Scoped via relation
+      investment: { userId: userId },
       status: "PAID"
     },
     orderBy: { datePaid: 'desc' },
     take: 5
   });
 
-  // 5. Map to Frontend Structure
+  // 6. Map to Frontend Structure
   return {
     totalInvested,      
     portfolioValue,     
@@ -95,6 +95,8 @@ export async function getDashboardStats() {
     portfolioItems: investments.map(inv => {
       const totalSchedules = inv.schedules.length;
       const paidSchedules = inv.schedules.filter(s => s.status === "PAID").length;
+      
+      // Calculate Equity/Percentage Completion based on schedules paid
       const percentageCompletion = totalSchedules > 0 
         ? Math.round((paidSchedules / totalSchedules) * 100) 
         : 0;
