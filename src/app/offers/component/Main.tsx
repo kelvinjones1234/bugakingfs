@@ -178,7 +178,7 @@ const Main = ({ initialProjects }: MainProps) => {
             <X size={36} strokeWidth={2} />
           </button>
 
-          <div className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-black">
+          <div className="">
             {fullScreenImage.includes("placehold") ? (
               <img
                 src={fullScreenImage}
