@@ -323,6 +323,7 @@ const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                 </div>
 
                 {/* Financial Summary */}
+                {/* Financial Summary */}
                 <div className="bg-[#d0a539]/5 border border-[#d0a539]/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4">
                   <div className="grid grid-cols-2 gap-4 sm:gap-6">
                     <div>
@@ -347,14 +348,17 @@ const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
                       </p>
                     </div>
 
-                    <div className="col-span-2">
-                      <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-[#171512]/40 mb-1">
-                        ROI Start Date
-                      </p>
-                      <p className="text-xs sm:text-sm font-black uppercase tracking-tighter mt-1 text-[#171512]">
-                        {currentPlan ? currentPlan.roi_start_display : "---"}
-                      </p>
-                    </div>
+                    {/* 👇 CONDITIONAL ROI DISPLAY: Only shows if asset_type is Farmland */}
+                    {project.asset_type?.toLowerCase() === "farmland" && (
+                      <div className="col-span-2">
+                        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-[#171512]/40 mb-1">
+                          ROI Start Date
+                        </p>
+                        <p className="text-xs sm:text-sm font-black uppercase tracking-tighter mt-1 text-[#171512]">
+                          {currentPlan ? currentPlan.roi_start_display : "---"}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
