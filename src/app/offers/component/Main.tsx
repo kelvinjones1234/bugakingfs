@@ -97,7 +97,7 @@ const getProjectTheme = (type: string, roi: string | number) => {
 // --- 4. Main Component ---
 
 const Main = ({ initialProjects }: MainProps) => {
-  const [projects] = useState<InvestmentProject[]>(initialProjects);
+  const projects = initialProjects;
   const [filterType, setFilterType] = useState("all");
 
   // Modal & Lightbox State
