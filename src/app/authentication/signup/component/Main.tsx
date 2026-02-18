@@ -205,7 +205,7 @@ const SignUpForm = () => {
               disabled={loading}
               className="w-full bg-[#d0a539] text-[#171512] font-black uppercase tracking-[0.2em] py-4 rounded-lg hover:bg-opacity-90 transition-all shadow-lg shadow-[#d0a539]/20 disabled:opacity-50"
             >
-              {loading ? <>Processing...</> : "Create Account"}
+              {loading ? <>Signing in...</> : "Sign up"}
             </button>
           </form>
 
