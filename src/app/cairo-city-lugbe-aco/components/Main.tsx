@@ -218,8 +218,8 @@ export default function Main() {
         </>
 
         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-light">
-          Secure a verified plot at Cairo City Estate with flexible, stress-free
-          payment plans, starting from ₦158,250 weekly.
+          A dedicated advisor will guide you from your first payment straight to
+          your final allocation papers.
         </p>
       </header>
 
@@ -419,7 +419,7 @@ export default function Main() {
                     <p className="text-xs text-[#d4af37]/90 font-medium uppercase tracking-wider mb-1">
                       Total Property Cost
                     </p>
-                    <h2 className="text-4xl font-bold gold-text-gradient font-['Playfair_Display',_serif] tracking-tight text-[#d4af37]">
+                    <h2 className="text-3xl font-bold gold-text-gradient font-['Playfair_Display',_serif] tracking-tight text-[#d4af37]">
                       ₦ <span>{formatCurrency(totalCost)}</span>
                     </h2>
                   </div>
