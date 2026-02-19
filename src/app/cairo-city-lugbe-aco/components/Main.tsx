@@ -147,7 +147,7 @@ export default function Main() {
           </div>
         </div>
 
-        <h1 className="font-['Playfair_Display',_serif] font-bold text-4xl md:text-6xl lg:text-7xl text-[#0a2f1c] leading-[1.1]">
+        {/* <h1 className="font-['Playfair_Display',_serif] font-bold text-4xl md:text-6xl lg:text-7xl text-[#0a2f1c] leading-[1.1]">
           Own{" "}
           <span className="relative inline-block">
             Verified
@@ -184,9 +184,42 @@ export default function Main() {
               ></path>
             </svg>
           </span>
-        </h1>
+        </h1> */}
+
+        <>
+          <h1 className="font-['Playfair_Display',_serif] font-bold text-4xl md:text-5xl lg:text-6xl text-[#0a2f1c] leading-[1.2] md:leading-[1.15]">
+            Own{" "}
+            <span className="relative inline-block">
+              Verified Abuja Land
+              <svg
+                className="absolute w-full h-3 md:h-4 -bottom-1 left-0 text-[#d4af37] opacity-80"
+                fill="none"
+                viewBox="0 0 200 9"
+                preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2.00025 6.99997C25.7501 3.99991 132.5 -8.19967 198 6.99997"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                ></path>
+              </svg>
+            </span>{" "}
+            in Lugbe <br className="hidden lg:block" />
+            <span className="block mt-3 md:mt-4 text-2xl md:text-4xl lg:text-5xl text-[#0a2f1c]/80 font-medium">
+              Without Paying Everything at Once.
+            </span>
+          </h1>
+
+          <p className="mt-6 text-base md:text-lg lg:text-xl text-[#0a2f1c]/70 font-medium max-w-2xl leading-relaxed">
+            150, 180 & 200sqm plots with weekly, monthly & outright payment
+            options.
+          </p>
+        </>
+
         <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-light">
-          Secure a verified plot at BugaKing Estate with flexible, stress-free
+          Secure a verified plot at Cairo City Estate with flexible, stress-free
           payment plans, starting from ₦158,250 weekly.
         </p>
       </header>
