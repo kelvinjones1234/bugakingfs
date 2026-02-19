@@ -206,7 +206,6 @@ export default function Main() {
                 ></path>
               </svg>
             </span>{" "}
-            in Lugbe <br className="hidden lg:block" />
             <span className="block mt-3 md:mt-4 text-2xl md:text-4xl lg:text-5xl text-[#0a2f1c]/80 font-medium">
               Without Paying Everything at Once.
             </span>
