@@ -140,13 +140,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
 "use server";
 
 // 👇 1. USE YOUR SINGLETON IMPORT (Prevents DB crashes)
@@ -155,7 +148,8 @@ import prisma from "../../../lib/data/prisma";
 
 // Helper to format currency to Naira
 const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat("en-NG", { // Changed to en-NG for Nigeria
+  return new Intl.NumberFormat("en-NG", {
+    // Changed to en-NG for Nigeria
     style: "currency",
     currency: "NGN", // Changed to NGN
     maximumFractionDigits: 0,
@@ -181,15 +175,15 @@ const getTimeLabel = (dueDate: Date) => {
 
 export async function getDashboardData() {
   try {
-    // 1. Fetch Stats Concurrently
     const [totalUsers, activeInvestments, pendingUsers, allInvestments] =
       await Promise.all([
-        prisma.user.count({ where: { isStaff: false } }),
+        // 👇 CHANGE THIS LINE: Remove the 'where' filter to count everyone
+        prisma.user.count(),
+
         prisma.clientInvestment.count({
           where: { status: { in: ["PAYING", "EARNING", "COMPLETED"] } },
         }),
         prisma.user.count({ where: { isApproved: false } }),
-        // We need all investments to calculate Portfolio Diversity & Total Value
         prisma.clientInvestment.findMany({
           select: {
             agreedAmount: true,
@@ -216,11 +210,13 @@ export async function getDashboardData() {
       id: inv.id,
       user: {
         name: `${inv.user.firstName} ${inv.user.lastName}`,
-        initials: `${inv.user.firstName?.[0] || ""}${inv.user.lastName?.[0] || ""}`.toUpperCase(),
+        initials:
+          `${inv.user.firstName?.[0] || ""}${inv.user.lastName?.[0] || ""}`.toUpperCase(),
         tier: inv.user.isApproved ? "Verified" : "Standard",
       },
       project: inv.selectedOption.project.name,
-      date: inv.createdAt.toLocaleDateString("en-GB", { // en-GB uses DD/MM/YYYY
+      date: inv.createdAt.toLocaleDateString("en-GB", {
+        // en-GB uses DD/MM/YYYY
         day: "numeric",
         month: "short",
         year: "numeric",
@@ -261,7 +257,7 @@ export async function getDashboardData() {
       if (type === "AGRICULTURE") agricultureCount++;
     });
 
-    const totalPortfolioCount = (realEstateCount + agricultureCount) || 1; 
+    const totalPortfolioCount = realEstateCount + agricultureCount || 1;
 
     const portfolio = [
       {
@@ -289,10 +285,15 @@ export async function getDashboardData() {
     console.error("Failed to fetch dashboard data:", error);
     // Return empty/safe structure on error so the page doesn't crash completely
     return {
-      stats: { totalUsers: "0", activeInvestments: "0", initiatedInvestments: "0", pendingApprovals: "0" },
+      stats: {
+        totalUsers: "0",
+        activeInvestments: "0",
+        initiatedInvestments: "0",
+        pendingApprovals: "0",
+      },
       recentInvestments: [],
       paymentsData: [],
-      portfolio: []
+      portfolio: [],
     };
   }
 }
