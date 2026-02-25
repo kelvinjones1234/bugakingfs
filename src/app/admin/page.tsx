@@ -1,6 +1,8 @@
 import React from "react";
 import Main from "./components/Main";
 
+export const dynamic = "force-dynamic";
+
 const AdminMain = () => {
   return (
     <div>
@@ -10,3 +12,4 @@ const AdminMain = () => {
 };
 
 export default AdminMain;
+ 
