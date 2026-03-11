@@ -6,8 +6,6 @@ import {
   Search,
   Trash2,
   Loader2,
-  User as UserIcon,
-  ShieldCheck,
   Briefcase,
   Plus,
   Edit2,
@@ -24,6 +22,8 @@ import {
 } from "@/app/actions/userActions";
 import AddUserModal, { UserFormState } from "./AddUserModal";
 
+import { useToast } from "@/components/Toast";
+
 const TableToggle = ({
   checked,
   onClick,
@@ -35,6 +35,7 @@ const TableToggle = ({
   isLoading: boolean;
   color?: string;
 }) => (
+  // ... (Keep your existing TableToggle code exactly the same)
   <button
     onClick={(e) => {
       e.stopPropagation();
@@ -66,6 +67,10 @@ interface UserMainProps {
 
 export default function Main({ data }: UserMainProps) {
   const router = useRouter();
+
+  // 2. INITIALIZE THE TOAST HOOK
+  const { success, error } = useToast();
+
   const [togglingActiveId, setTogglingActiveId] = useState<string | null>(null);
   const [togglingApprovedId, setTogglingApprovedId] = useState<string | null>(
     null,
@@ -77,6 +82,7 @@ export default function Main({ data }: UserMainProps) {
   const [modalInitialData, setModalInitialData] =
     useState<Partial<UserFormState> | null>(null);
 
+  // ... (Keep handleCreate, handleEdit, handleSaveUser the same)
   const handleCreate = () => {
     setEditingUserId(null);
     setModalInitialData(null);
@@ -107,35 +113,63 @@ export default function Main({ data }: UserMainProps) {
     }
   };
 
+  // 3. UPDATE TOGGLE HANDLERS WITH TOASTS
   const handleToggleActive = async (user: UIUser) => {
     setTogglingActiveId(user.id);
     const result = await toggleUserActive(user.id, user.isActive);
-    if (result.success) router.refresh();
-    else alert("Failed to update active status");
+    if (result.success) {
+      // Note: We use !user.isActive because we are announcing the NEW state
+      success(
+        "Status Updated",
+        `${user.fullName} is now ${!user.isActive ? "active" : "inactive"}.`,
+      );
+      router.refresh();
+    } else {
+      error("Update Failed", "Failed to update active status.");
+    }
     setTogglingActiveId(null);
   };
 
   const handleToggleApproved = async (user: UIUser) => {
     setTogglingApprovedId(user.id);
     const result = await toggleUserApproved(user.id, user.isApproved);
-    if (result.success) router.refresh();
-    else alert("Failed to update approval status");
+    if (result.success) {
+      success(
+        "Approval Updated",
+        `${user.fullName} has been ${!user.isApproved ? "approved" : "unapproved"}.`,
+      );
+      router.refresh();
+    } else {
+      error("Update Failed", "Failed to update approval status.");
+    }
     setTogglingApprovedId(null);
   };
 
   const handleToggleStaff = async (user: UIUser) => {
     setTogglingStaffId(user.id);
     const result = await toggleUserStaff(user.id, user.isStaff);
-    if (result.success) router.refresh();
-    else alert("Failed to update staff status");
+    if (result.success) {
+      success(
+        "Role Updated",
+        `${user.fullName} is ${!user.isStaff ? "now staff" : "no longer staff"}.`,
+      );
+      router.refresh();
+    } else {
+      error("Update Failed", "Failed to update staff status.");
+    }
     setTogglingStaffId(null);
   };
 
+  // I went ahead and added it to the delete function as well for consistency
   const handleDelete = async (user: UIUser) => {
     if (!window.confirm(`Delete ${user.fullName}?`)) return;
     const result = await deleteUser(user.id);
-    if (result.success) router.refresh();
-    else alert("Failed to delete: " + result.error);
+    if (result.success) {
+      success("User Deleted", `${user.fullName} has been removed.`);
+      router.refresh();
+    } else {
+      error("Deletion Failed", result.error || "Failed to delete user.");
+    }
   };
 
   const filteredData = data.filter(

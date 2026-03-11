@@ -8,7 +8,6 @@ import {
   FileText,
   History,
   Plus,
-  Receipt,
   Mail,
   Phone,
   MapPin,
@@ -87,16 +86,7 @@ export default function Main({ data }: MainProps) {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button className="bg-white border border-[#171512]/10 text-[#171512] px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-[#f8f7f6] transition-all flex items-center gap-2 luxury-shadow">
-            <FileText className="w-5 h-5" />
-            Download Agreement
-          </button>
-          <button className="bg-[#171512] text-white px-6 py-3 rounded-lg text-xs font-black uppercase tracking-wider hover:bg-black transition-all flex items-center gap-2 shadow-lg">
-            <History className="w-5 h-5" />
-            Audit Log
-          </button>
-        </div>
+        
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

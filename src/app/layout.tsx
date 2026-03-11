@@ -6,6 +6,8 @@ import { AuthProvider } from "@/components/providers/AuthProvider";
 
 // 1. Import the Silent Handler
 import SilentInvestmentHandler from "./dashboard/components/SilentInvestmentHandler";
+import { ToastProvider } from "@/components/Toast";
+
 export const metadata = {
   title: "BugaKing",
   description: "BugaKing - Agriculture, Technology & Real Estate",
@@ -41,21 +43,21 @@ export default function RootLayout({
       </head>
 
       <body suppressHydrationWarning={true} className="text-black">
-        {/* 2. Wrap everything with Providers */}
+        {/* Wrap everything with Providers */}
         <AuthProvider>
-          {/* 3. Place the Handler HERE. 
-             It sits invisibly at the top level of your app.
-             As soon as <Providers> detects a session, this component runs.
-          */}
-          <SilentInvestmentHandler />
+          {/* Wrap the app with ToastProvider so all children can trigger toasts */}
+          <ToastProvider>
+            {/* The Handler sits invisibly at the top level of your app. */}
+            <SilentInvestmentHandler />
 
-          <Suspense fallback={null}>
-            <GAListener />
-          </Suspense>
-          
-          {children}
+            <Suspense fallback={null}>
+              <GAListener />
+            </Suspense>
+            
+            {children}
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
   );
-}
+} 

@@ -29,6 +29,9 @@ import AddInvestmentModal, {
   PaymentMode,
 } from "./AddInvestmentModal";
 
+// 1. IMPORT YOUR HOOK HERE
+import { useToast } from "@/components/Toast";
+
 // --- Components ---
 const TableToggle = ({
   checked,
@@ -45,22 +48,25 @@ const TableToggle = ({
       onClick();
     }}
     disabled={isLoading}
-    className={`relative inline-flex items-center select-none transition-all ${
-      isLoading ? "opacity-50 cursor-wait" : "cursor-pointer opacity-100"
-    }`}
+    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d0a539] focus-visible:ring-opacity-75 ${
+      isLoading ? "opacity-50 cursor-wait" : ""
+    } ${checked ? "bg-[#d0a539]" : "bg-[#171512]/20"}`}
   >
-    <div
-      className={`w-8 h-4 sm:w-10 sm:h-5 rounded-full shadow-inner transition-colors ${
-        checked ? "bg-[#d0a539]/20" : "bg-[#171512]/10"
-      }`}
-    ></div>
-    <div
-      className={`absolute left-0.5 top-0.5 w-3 h-3 sm:w-4 sm:h-4 rounded-full transition-transform shadow-sm flex items-center justify-center ${
-        checked ? "translate-x-full bg-[#d0a539]" : "bg-white"
+    <span className="sr-only">Toggle active status</span>
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none inline-flex h-5 w-5 transform items-center justify-center rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+        checked ? "translate-x-5" : "translate-x-0"
       }`}
     >
-      {isLoading && <Loader2 className="w-2 h-2 sm:w-3 sm:h-3 animate-spin text-[#171512]" />}
-    </div>
+      {isLoading && (
+        <Loader2 
+          className={`w-3 h-3 animate-spin ${
+            checked ? "text-[#d0a539]" : "text-[#171512]/40"
+          }`} 
+        />
+      )}
+    </span>
   </button>
 );
 
@@ -70,6 +76,9 @@ interface InvestmentProjectsProps {
 
 export default function Main({ data }: InvestmentProjectsProps) {
   const router = useRouter();
+  
+  // 2. INITIALIZE THE TOAST HOOK
+  const { success, error } = useToast();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
@@ -78,7 +87,7 @@ export default function Main({ data }: InvestmentProjectsProps) {
 
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterSector, setFilterSector] = useState("All Sectors"); // 👈 Updated to Sector
+  const [filterSector, setFilterSector] = useState("All Sectors");
 
   // Filtering Logic
   const filteredData = data.filter((item) => {
@@ -86,7 +95,6 @@ export default function Main({ data }: InvestmentProjectsProps) {
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.location.toLowerCase().includes(searchQuery.toLowerCase());
       
-    // 👈 Checks if "Real Estate" matches "REAL_ESTATE" in the DB
     const matchesSector =
       filterSector === "All Sectors" || 
       item.investment_type.toUpperCase() === filterSector.toUpperCase().replace(" ", "_");
@@ -100,9 +108,10 @@ export default function Main({ data }: InvestmentProjectsProps) {
     const newStatus = !project.active;
     const result = await toggleInvestmentActive(project.id, newStatus);
     if (result.success) {
+      success("Status Updated", `${project.name} is now ${newStatus ? "active" : "inactive"}.`);
       router.refresh();
     } else {
-      alert("Failed to update status");
+      error("Update Failed", "Failed to update project status.");
     }
     setTogglingId(null);
   };
@@ -146,13 +155,19 @@ export default function Main({ data }: InvestmentProjectsProps) {
 
   const handleSave = async (payload: FormData) => {
     let result;
+    const projectName = payload.get("name") as string || "Project";
+    
     if (editingProjectId) {
       result = await updateInvestment(editingProjectId, payload);
     } else {
       result = await createInvestment(payload);
     }
+    
     if (result.success) {
+      success("Project Saved", `${projectName} has been successfully saved.`);
       router.refresh();
+    } else {
+      error("Save Failed", "There was an issue saving the project details.");
     }
     return result;
   };
@@ -165,9 +180,10 @@ export default function Main({ data }: InvestmentProjectsProps) {
 
     const result = await deleteInvestment(project.id);
     if (result.success) {
+      success("Project Deleted", `${project.name} has been permanently removed.`);
       router.refresh();
     } else {
-      alert("Failed to delete: " + result.error);
+      error("Deletion Failed", result.error || "Failed to delete project.");
     }
   };
 
@@ -215,7 +231,6 @@ export default function Main({ data }: InvestmentProjectsProps) {
         <div className="flex flex-wrap gap-3">
           <div className="relative w-full sm:w-auto min-w-[160px]">
             <Layers className="absolute left-3 top-1/2 -translate-y-1/2 text-[#d0a539] w-4 h-4" />
-            {/* 👈 Updated Select Options */}
             <select
               className="w-full pl-10 pr-8 py-3 bg-white border border-[#171512]/10 rounded-xl text-xs font-bold uppercase tracking-widest appearance-none focus:ring-2 focus:ring-[#d0a539] focus:border-[#d0a539] outline-none"
               value={filterSector}
@@ -304,7 +319,6 @@ export default function Main({ data }: InvestmentProjectsProps) {
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 text-center">
                       <span className="px-2 py-0.5 border border-[#d0a539]/40 text-[#d0a539] text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded bg-[#d0a539]/5 whitespace-nowrap">
-                        {/* 👈 Replace underscore with space here */}
                         {project.investment_type.replace(/_/g, " ")}
                       </span>
                     </td>

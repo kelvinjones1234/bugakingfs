@@ -126,7 +126,7 @@ export const Sidebar = () => {
           onClick={handleLogout}
           className="w-full bg-[#d0a539] text-[#171512] font-black uppercase tracking-widest p-4 rounded-xl shadow-lg shadow-[#d0a539]/20 hover:scale-[1.02] active:scale-95 transition-all text-xs flex items-center justify-between gap-2 group"
         >
-          Logout Securely
+          Logout
           <LogOut
             size={16}
             strokeWidth={3}

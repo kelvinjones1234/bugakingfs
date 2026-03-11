@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { getDashboardData } from "@/app/actions/adminDashboard";
 
-// --- Types & Interfaces --- 
+// --- Types & Interfaces ---
 interface StatCardProps {
   title: string;
   value: string;
@@ -278,10 +278,6 @@ export default async function Main() {
                   No pending payments.
                 </p>
               )}
-
-              <button className="w-full py-3 border-2 border-dashed border-[#171512]/10 rounded-xl text-xs font-bold uppercase tracking-widest text-[#171512]/40 hover:border-[#d0a539] hover:text-[#d0a539] transition-all">
-                View Payment Calendar
-              </button>
             </div>
           </div>
 
